@@ -8,49 +8,6 @@ const isProduction = process.env.NODE_ENV === 'production'; //判断是否是生
 const templating = require('./templating');
 const model = require('./model');
 const cors = require('koa2-cors');
-
-// var now = Date.now();
-// let Pet = model.Pet;
-// (async () => {
-//   let pets = await Pet.findAll({
-//     where: {
-//       name: 'Gaffey'
-//     }
-//   });
-//   console.log(`find ${pets.length} pets:`)
-//   for (let p of pets) {
-//     console.log(JSON.stringify(p));
-//   }
-// })();
-
-//如果要更新数据，可以对查询到的实例调用save()方法：
-// (async () => {
-//   let ps = await Pet.findAll({
-//     where: {
-//       name: 'Gaffey'
-//     }
-//   });
-//   for (let p of ps) {
-//     if (p.name == 'Gaffey') {
-//       p.gender = true;
-//       p.updatedAt = Date.now();
-//       p.version++;
-//       await p.save();
-//     }
-//   }
-// })();
-
-// 如果要删除数据， 可以对查询到的实例调用destroy() 方法：
-// (async ()=> {
-//    let ps = await Pet.findAll({
-//      where: {
-//        name: 'Gaffey'
-//      }
-//    })
-//    for(let p of ps) {
-//      await p.destroy();
-//    }
-// })();
 //允许跨域
 app.use(cors({
   origin: function (ctx) {
@@ -85,5 +42,5 @@ app.use(templating(path.resolve(__dirname, 'views'), {
 
 app.use(controller());
 
-app.listen(9090)
-console.log('Server is runnint at http://127.0.0.1:9090')
+app.listen(8080)
+console.log('Server is runnint at http://127.0.0.1:8080')

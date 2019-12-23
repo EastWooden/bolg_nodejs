@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="https://at.alicdn.com/t/font_853739_nu2mm3kygkd.css">
+  <link rel="stylesheet" href="./combo.select.css">
+  <style type="text/css">
+    #wrapper {
+      padding: 10px;
+    }
+
+    .select-box-list {
+      margin: 10px auto;
+    }
+
+    .sel-box {
+      width: 500px;
+      height: 40px;
+      line-height: 40px;
+      background: #fff;
+      outline: none;
+      border-color: #ccc;
+      vertical-align: middle;
+    }
+
+    .icon-add {
+      font-size: 20px;
+      vertical-align: middle;
+      padding: 5px;
+      background: #00d3c8;
+      border-radius: 100%;
+      color: #fff;
+    }
+
+    .icon-close {
+      font-size: 20px;
+      vertical-align: middle;
+      padding: 5px;
+      background: #ffd29b;
+      border-radius: 100%;
+      color: #fff;
+    }
+
+    .search-input {
+      height: 40px;
+      background: transparent;
+      line-height: 40px;
+      border: none;
+      position: absolute;
+      width: 100%;
+      outline: none;
+      padding-left: 20px;
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="wrapper">
+    <div class="select-box-list">
+      <input type="text" class="search-input" />
+      <select class="sel-box" name="fdfd">
+      </select>
+      <i class="iconfont icon-add"></i>
+    </div>
+
+  </div>
+  <button type="submit">提交</button>
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+  $(function () {
+    var resData = [];
+    $.ajax({
+      url: 'http://192.168.6.222:30003/user/findDepTree',
+      method: 'get',
+      dataType: 'jsonp',
+      success: function (res) {
+        console.log(res);
+        var data = res.entity;
+        resData = data;
+        data.forEach(function (item, index) {
+          var option = $('<option value="' + item.LEVELCODE + '">' + item.NAME + '<option>');
+          $('.sel-box').append(option);
+        });
+      }
+    })
+    $('body').on('click', '.icon-add', function () {
+      var addSelectbox = $(
+        '<div class="select-box-list"><select class="sel-box" name=""></select> <i class="iconfont icon-add"></i> <i class="iconfont icon-close"></i></div> '
+      )
+      resData.forEach(function (item, index) {
+        var option = $('<option value="' + item.LEVELCODE + '">' + item.NAME + '<option>');
+        addSelectbox.children('select').append(option)
+      })
+      $('#wrapper').append(addSelectbox);
+    })
+
+    $('body').on('click', '.icon-close', function (e) {
+      e.stopPropagation();
+      var delwrapper = $(this).parent();
+      delwrapper.remove();
+    })
+    var values = '';
+    // $('body').on('dblclick', '.select-box-list', function (e) {
+
+    //   console.log('双击');
+    // })
+    // choseValue('select');
+
+
+    // function choseValue(selector) {
+    //   $('body').on('change', selector, function () {
+    //     console.log($(this).val());
+    //     values += ',' + $(this).val();
+    //     console.log(values);
+    //     var valueArray = values.split(',');
+    //     var totalLenth = $('#wrapper').children('.select-box-list').length;
+    //     valuesarry = valueArray.slice(-totalLenth, valueArray.length - 1);
+    //     values = valuesarry.join(',')
+    //     // if (totalLenth <= 1) {
+    //     //   values = valueArray[0];
+    //     // } else {
+    //     //   valuesarry = valueArray.slice(-totalLenth, valueArray.length);
+    //     //   // console.log(valuesarry);
+
+    //     // }
+
+    //     // console.log(values);
+    //   })
+    // }
+  })
+</script>
+<script src="./jquery.combo.select.js"></script>
+<script>
+  $(function () {
+    $('select').comboSelect()
+  });
+</script>
+</html>

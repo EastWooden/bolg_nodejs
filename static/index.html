@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="https://at.alicdn.com/t/font_853739_nu2mm3kygkd.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <style type="text/css">
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    li {
+      list-style: none;
+    }
+
+    #wrapper {
+      padding: 10px;
+      margin: 100px;
+    }
+
+    .select-box-list {
+      margin: 10px auto;
+      position: relative;
+    }
+
+    .sel-box {
+      width: 400px;
+      line-height: 40px;
+      background: #fff;
+      outline: none;
+      border-color: #ccc;
+      vertical-align: middle;
+    }
+
+    .icon-add {
+      font-size: 20px;
+      vertical-align: middle;
+      padding: 5px;
+      background: #00d3c8;
+      border-radius: 100%;
+      color: #fff;
+    }
+
+    .icon-close {
+      font-size: 20px;
+      vertical-align: middle;
+      padding: 5px;
+      background: #ffd29b;
+      border-radius: 100%;
+      color: #fff;
+    }
+
+    .sel-input {
+      height: 40px;
+      background: transparent;
+      line-height: 40px;
+      border: none;
+      border-radius: 3px;
+      /* position: absolute; */
+      width: 400px;
+      outline: none;
+      padding-left: 20px;
+      /* display: none; */
+      background: #fff;
+      border: solid #00d3c8 1px;
+      display: inline-block;
+    }
+
+    .sle-box-list {
+      width: 420px;
+      height: 300px;
+      overflow: auto;
+      display: none;
+      position: absolute;
+      z-index: 99;
+      top: 40px;
+      background: #fff;
+      border: solid 1px #ccc;
+    }
+
+    .sle-box-list li {
+      padding-left: 20px;
+      border-bottom: solid 1px #ccc;
+      cursor: pointer;
+    }
+
+    .sle-box-list li:hover {
+      background: #00d3c8;
+      color: #fff;
+    }
+  </style>
+</head>
+
+<body>
+  <form id="myForm">
+    <div id="wrapper">
+      <div class="select-box-list">
+        <div>
+          <input class='sel-input' type="text" name="sel" />
+          <i class="iconfont icon-add"></i>
+        </div>
+        <div class="sel-box">
+          <ul class="sle-box-list">
+
+          </ul>
+        </div>
+      </div>
+    </div>
+    <button type="button">提交</button>
+    <div id="downloadFile">下载</div>
+  </form>
+
+</body>
+<script>
+  $(function () {
+    var num = 0;
+    var resData = [];
+    $.ajax({
+      url: 'http://192.168.6.222:30003/user/findDepTree',
+      method: 'get',
+      dataType: 'jsonp',
+      success: function (res) {
+        console.log(res);
+        var data = res.entity;
+        resData = data;
+        data.forEach(function (item, index) {
+          if (item.LEVELCODE) {
+            var li = $('<li data-value="' + item.LEVELCODE + '">' + item.NAME + '</li>');
+          }
+          $('.sle-box-list').append(li);
+        });
+      }
+    })
+    $('body').on('focus', '.sel-input', function () {
+      $(this).parent().siblings('.sel-box').children('.sle-box-list').css({
+        'display': 'block',
+      })
+    })
+    $('body').on('blur', '.sel-input', function () {
+      var that = $(this);
+      setTimeout(function () {
+        var ullist = $('<ul class="sle-box-list" style="display:block"></ul>')
+        resData.forEach(function (item, index) {
+          var li = $('<li data-value="' + item.LEVELCODE + '">' + item.NAME + '</li>');
+          ullist.append(li);
+        })
+        that.parent().siblings('.sel-box').html(ullist);
+        that.parent().siblings('.sel-box').children('.sle-box-list').css({
+          'display': 'none',
+        })
+      }, 100)
+    })
+
+    $('body').on('input', '.sel-input', function () {
+      var data = resData;
+      var inputValue = $(this).val();
+      var reg = new RegExp(inputValue, 'g');
+      var ullist = $('<ul class="sle-box-list" style="display:block"></ul>')
+      data.forEach(function (item, index) {
+        if (item.NAME.search(reg) > -1) {
+          var li = $('<li data-value="' + item.LEVELCODE + '">' + item.NAME + '</li>');
+          ullist.append(li);
+        }
+      })
+      $(this).parent().siblings('.sel-box').html(ullist);
+    })
+
+    $('body').on('click', 'li', function () {
+      var text = $(this).text(); //选取的文本值
+      var leaveCodevalue = $(this).attr('data-value'); //选取的leaveCode值
+      $(this).parent().parent().siblings('div').children('.sel-input').val(text);
+      $(this).parent().css({
+        'display': 'none'
+      })
+    })
+
+    $('body').on('click', '.icon-add', function () {
+      num++;
+      var newSelect = $(
+        '<div class="select-box-list"><div><input class="sel-input" name="sel" type="text" /> <i class="iconfont icon-add"></i> <i class="iconfont icon-close"></i></div><div class="sel-box"><ul class="sle-box-list"> </ul></div></div>'
+      )
+      if (resData.length) {
+        resData.forEach(function (item, index) {
+          var li = $('<li data-value="' + item.LEVELCODE + '">' + item.NAME + '</li>');
+          newSelect.find('.sle-box-list').append(li);
+        })
+      }
+      $('#wrapper').append(newSelect)
+    })
+
+    $('body').on('click', '.icon-close', function (e) {
+      e.stopPropagation();
+      var delwrapper = $(this).parent().parent();
+      delwrapper.remove();
+    })
+    $('body').on('click', 'button', function () {
+      var text = $('#myForm').serialize();
+      text = decodeURI(text).replace(/&/g, '');
+      let textArray = text.split('sel=');
+      textArray.shift();
+      for (var i = 0; i < resData.length; i++) {
+        for (var j = 0; j < textArray.length; j++) {
+          if (textArray[j] == resData[i].NAME) {
+            textArray[j] = resData[i].LEVELCODE;
+          }
+        }
+      }
+      //提交的值
+      var submittext = textArray.join(',');
+      console.log(submittext)
+
+    })
+
+    $('#downloadFile').on('click',function() {
+      window.open(`http://192.168.6.49:30003/applet/readPdf?levelCode=1&id=44624&type=5&userId=3`)
+    })
+  })
+</script>
+
+</html>
